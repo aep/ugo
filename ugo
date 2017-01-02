@@ -1,0 +1,30 @@
+#!/bin/sh
+set -e
+
+UGO_ROOT=""
+for i in $(echo $PWD | tr "/" "\n")
+do
+    if test -f .gopackage
+    then
+        export UGO_ROOT="$PWD"
+        export UGO_PACKAGE="$(cat .gopackage)"
+        break
+    fi
+    cd ..
+done
+
+if [ "$UGO_ROOT" = "" ]
+then
+    echo "ugo requires a .gopackage file in your packages root that contains the full package name"
+    exit 2
+fi
+
+UGO_FN="${UGO_ROOT}/.workspace/src/${UGO_PACKAGE}"
+mkdir -p "$(dirname ${UGO_FN})"
+test -e "${UGO_FN}" && rm "${UGO_FN}"
+ln -sf "${UGO_ROOT}" "${UGO_FN}"
+
+cd "${UGO_FN}"
+export GOPATH="${GOPATH}:${UGO_ROOT}/.workspace/:${UGO_ROOT}"
+
+"$@"
