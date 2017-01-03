@@ -27,4 +27,23 @@ ln -sf "${UGO_ROOT}" "${UGO_FN}"
 cd "${UGO_FN}"
 export GOPATH="${GOPATH}:${UGO_ROOT}/.workspace/:${UGO_ROOT}"
 
-"$@"
+while true
+do
+    case "$1" in
+        -h)
+            echo "usage: $o [options] command"
+            echo " options:"
+            echo "  -h help"
+            echo "  -r replace existing GOPATH instead of adding"
+            exit 2
+            ;;
+        -r)
+            export GOPATH="${UGO_ROOT}/.workspace/"
+            shift
+            ;;
+        *)
+            "$@"
+            exit $?
+            ;;
+    esac
+done

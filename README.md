@@ -62,8 +62,9 @@ $ u ginkgo generate
 ```
 
 
-You can also modify this script to not add but replace the workspace, which works exactly the same way,
+You can also pass -r to this script to not add but replace the workspace, which works exactly the same way,
 except that all dependencies are redownloaded for every project. I'd recommend using vendoring instead.
+-r also serves as a workaround for broken tools that only accept a single path in GOPATH
 
 
 background
