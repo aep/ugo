@@ -25,7 +25,7 @@ test -e "${UGO_FN}" && rm "${UGO_FN}"
 ln -sf "${UGO_ROOT}" "${UGO_FN}"
 
 cd "${UGO_FN}"
-export GOPATH="${GOPATH}:${UGO_ROOT}/.workspace/:${UGO_ROOT}"
+export GOPATH="${UGO_ROOT}/.workspace/:${UGO_ROOT}:${GOPATH}"
 
 while true
 do
