@@ -1,6 +1,7 @@
 #!/bin/sh
 set -e
 
+PPWD="$PWD"
 UGO_ROOT=""
 for i in $(echo $PWD | tr "/" "\n")
 do
@@ -16,6 +17,27 @@ done
 if [ "$UGO_ROOT" = "" ]
 then
     echo "ugo requires a .gopackage file in your packages root that contains the full package name"
+    cd "$PPWD"
+    for i in $(echo $PWD | tr "/" "\n")
+    do
+        if test -d .git && git ls-remote --get-url | grep -q '://github.com/'
+        then
+            p="$(git ls-remote --get-url   | cut -d '/' -f 3-)"
+            pp="$(dirname $p)/$(basename $p .git)"
+
+            echo "press return to create a .gopackage now with content: $pp"
+            read
+            echo "$pp" > .gopackage
+            export UGO_ROOT="$PWD"
+            export UGO_PACKAGE="$(cat .gopackage)"
+            break
+        fi
+        cd ..
+    done
+fi
+
+if [ "$UGO_ROOT" = "" ]
+then
     exit 2
 fi
 
