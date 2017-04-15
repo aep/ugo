@@ -45,11 +45,11 @@ If you implement something else that uses .gopackage, let me know and i'll link 
 
 
 ```sh
-git clone https://raw.githubusercontent.com/aep/ugo/master/ugo
+git clone https://github.com/aep/ugo.git
 ln -s $PWD/ugo/ugo ~/bin/u
 ```
 
-ugo anything will create the virtual workspace, add it to your existing gopath and then exec "anything"
+"u anything" will create the virtual workspace, add it to your existing gopath and then exec "anything"
 
 this also works with other tools need to know the import path,
 such as generators or parsers, for example to use ginkgo generate just prefix it with "u"
