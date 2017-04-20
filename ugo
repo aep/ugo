@@ -41,12 +41,14 @@ then
     exit 2
 fi
 
+
 UGO_FN="${UGO_ROOT}/.workspace/src/${UGO_PACKAGE}"
 mkdir -p "$(dirname ${UGO_FN})"
 test -e "${UGO_FN}" && rm "${UGO_FN}"
 ln -sf "${UGO_ROOT}" "${UGO_FN}"
 
-cd "${UGO_FN}"
+RPWD=$(realpath --relative-to="$UGO_ROOT" "$PPWD")
+cd "${UGO_FN}/${RPWD}"
 export GOPATH="${UGO_ROOT}/.workspace/:${UGO_ROOT}:${GOPATH}"
 
 while true
