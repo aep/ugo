@@ -11,8 +11,10 @@ this is the one workaround you need.
 | tested with         | works  |
 |-------------------  |------- |
 | go1.7.4 linux/amd64 | yep    |
+| go1.8.3 linux/amd64 | yep    |
 
-please open a github issue to report if it works on your platform (windows is not supported)
+
+Please open a github issue to report if it works on your platform (windows is not supported)
 
 
 the fix
@@ -25,8 +27,8 @@ $ git clone github.com/foo/bar && cd something
 $ go get
   error: you have angered the GOPATH god
 $ echo 'github.com/foo/bar' > .gopackage
-$ u go get
-$ u go build
+$ ugo go get
+$ ugo go build
 # just bloody works
 ```
 
@@ -45,19 +47,18 @@ If you implement something else that uses .gopackage, let me know and i'll link 
 
 
 ```sh
-git clone https://github.com/aep/ugo.git
-ln -s $PWD/ugo/ugo ~/bin/u
+go get -u github.com/aep/ugo
 ```
 
-"u anything" will create the virtual workspace, add it to your existing gopath and then exec "anything"
+"ugo anything" will create the virtual workspace, add it to your existing gopath and then exec "anything"
 
-this also works with other tools need to know the import path,
-such as generators or parsers, for example to use ginkgo generate just prefix it with "u"
+This also works with other tools need to know the import path,
+such as generators or parsers, for example to use ginkgo generate just prefix it with "ugo"
 
 ```sh
 $ ginkgo generate
 Couldn't identify package import path.
-$ u ginkgo generate
+$ ugo ginkgo generate
 #works fine
 ```
 
