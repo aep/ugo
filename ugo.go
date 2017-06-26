@@ -8,9 +8,9 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
+	"syscall"
 )
 
 const gopkgFilename = ".gopackage"
@@ -149,7 +149,7 @@ func createWorkspace(gopkgPath string) (string, error) {
 	return symlink, nil
 }
 
-func getEnvironment(replace bool, gopkgPath string) []string {
+func getEnvironment(replace bool, gopkgPath string, pkgPath string) []string {
 	env := make(map[string]string)
 	for _, e := range os.Environ() {
 		if i := strings.Index(e, "="); i >= 0 {
@@ -159,11 +159,14 @@ func getEnvironment(replace bool, gopkgPath string) []string {
 
 	gopath := path.Join(gopkgPath, ".workspace")
 
-	if replace {
+	if replace || len(env["GOPATH"]) == 0 {
 		env["GOPATH"] = gopath
 	} else {
 		env["GOPATH"] += ":" + gopath
 	}
+
+	// Set the pwd variable to the directory in the workspace
+	env["PWD"] = pkgPath
 
 	result := []string{}
 
@@ -175,13 +178,16 @@ func getEnvironment(replace bool, gopkgPath string) []string {
 }
 
 var (
-	replaceGopath = kingpin.Flag("replace", "Replace existing GOPATH instead of adding.").Default("false").Short('r').Bool()
-	command       = kingpin.Arg("command", "The command that should be executed by ugo.").Required().String()
-	commandArgs   = kingpin.Arg("arguments", "The arguments for the command.").Strings()
+	app           = kingpin.New("ugo", "A tool for manipulating the GOPATH variable")
+	replaceGopath = app.Flag("replace", "Replace existing GOPATH instead of adding.").Default("false").Short('r').Bool()
+	command       = app.Arg("command", "The command that should be executed by ugo.").Required().String()
+	commandArgs   = app.Arg("arguments", "The arguments for the command.").Strings()
 )
 
 func main() {
-	kingpin.Parse()
+	// The flags need to be present before the positional arguments
+	app.Interspersed(false)
+	kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	gopkgPath, err := findGopackagePath()
 
@@ -201,18 +207,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	cmdstr := fmt.Sprintf("cd %s && %s %s", pkgPath, *command, strings.Join(*commandArgs, " "))
+	os.Chdir(pkgPath)
+	syscall.Exec(*command, append([]string{*command}, *commandArgs...), getEnvironment(*replaceGopath, gopkgPath, pkgPath))
 
-	cmd := exec.Command("sh", "-c", cmdstr)
-	cmd.Env = getEnvironment(*replaceGopath, gopkgPath)
-
-	output, err := cmd.CombinedOutput()
-
-	fmt.Printf("%s", output)
-
-	if err != nil {
-		os.Exit(1)
-	} else {
-		os.Exit(0)
-	}
+	os.Exit(1)
 }
