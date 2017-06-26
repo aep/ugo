@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 	"syscall"
@@ -195,20 +196,25 @@ func main() {
 		gopkgPath, err = createGopackageFile()
 
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			panic(err)
 		}
 	}
 
 	pkgPath, err := createWorkspace(gopkgPath)
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		panic(err)
 	}
 
 	os.Chdir(pkgPath)
-	syscall.Exec(*command, append([]string{*command}, *commandArgs...), getEnvironment(*replaceGopath, gopkgPath, pkgPath))
 
-	os.Exit(1)
+	fullCommandPath, err := exec.LookPath(*command)
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = syscall.Exec(fullCommandPath, append([]string{*command}, *commandArgs...), getEnvironment(*replaceGopath, gopkgPath, pkgPath))
+
+	panic(err)
 }
