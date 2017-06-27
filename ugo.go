@@ -49,14 +49,14 @@ func getGopackage(gopackagePath string) (string, error) {
 		return "", err
 	}
 
-	return string(content), nil
+	return strings.Replace(string(content), "\n", "", 1), nil
 }
 
 func gitURLToPackageName(urlStr string) (string, error) {
 	urlStr = strings.Replace(urlStr, ".git", "", 1)
 
 	if strings.HasPrefix(urlStr, "git@") {
-		return strings.Replace(strings.TrimPrefix(urlStr, "git@"), ":", "/", 1), nil
+		urlStr = strings.Replace(strings.TrimPrefix(urlStr, "git@"), ":", "/", 1)
 	}
 
 	url, err := url.Parse(urlStr)
@@ -64,9 +64,7 @@ func gitURLToPackageName(urlStr string) (string, error) {
 		return "", err
 	}
 
-	url.Scheme = ""
-	return url.String(), nil
-
+	return url.Hostname() + url.Path, nil
 }
 
 func getPossiblePackageNames() (pkgsToPath map[string]string, err error) {
