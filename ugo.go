@@ -89,7 +89,7 @@ func getPossiblePackageNames() (pkgsToPath map[string]string, err error) {
 		}
 
 		for _, remote := range conf.Remotes {
-			url, err := gitURLToPackageName(remote.URL)
+			url, err := gitURLToPackageName(remote.URLs[0])
 
 			if err != nil {
 				continue
