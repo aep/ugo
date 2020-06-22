@@ -1,3 +1,11 @@
+DED
+-------
+
+THIS IS NO LONGER NESSESARY
+
+go finally supports modules natively
+
+
 ugo
 -------
 
